@@ -523,46 +523,74 @@ public class AdvancedWebView extends WebView {
 					}
 				}
 
-				final Uri uri = Uri.parse(url);
-				final String scheme = uri.getScheme();
+				try {
+					final Uri uri = Uri.parse(url);
+					final String scheme = uri.getScheme();
 
-				if (scheme != null) {
-					final Intent externalSchemeIntent;
+					if (scheme != null) {
+						final Intent externalSchemeIntent;
+						final Intent existPackage;
 
-					if (scheme.equals("tel")) {
-						externalSchemeIntent = new Intent(Intent.ACTION_DIAL, uri);
-					}
-					else if (scheme.equals("sms")) {
-						externalSchemeIntent = new Intent(Intent.ACTION_SENDTO, uri);
-					}
-					else if (scheme.equals("mailto")) {
-						externalSchemeIntent = new Intent(Intent.ACTION_SENDTO, uri);
-					}
-					else if (scheme.equals("whatsapp")) {
-						externalSchemeIntent = new Intent(Intent.ACTION_SENDTO, uri);
-						externalSchemeIntent.setPackage("com.whatsapp");
-					}
-					else {
-						externalSchemeIntent = null;
-					}
-
-					if (externalSchemeIntent != null) {
-						externalSchemeIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-
-						try {
+						if (scheme.equals("tel")) {
+							externalSchemeIntent = new Intent(Intent.ACTION_DIAL, uri);
+							existPackage = null;
+						}
+						else if (scheme.equals("sms")) {
+							externalSchemeIntent = new Intent(Intent.ACTION_SENDTO, uri);
+							existPackage = null;
+						}
+						else if (scheme.equals("mailto")) {
+							externalSchemeIntent = new Intent(Intent.ACTION_SENDTO, uri);
+							existPackage = null;
+						}
+						else if (scheme.equals("whatsapp")) {
+							externalSchemeIntent = new Intent(Intent.ACTION_SENDTO, uri);
+							externalSchemeIntent.setPackage("com.whatsapp");
+							existPackage = null;
+						}
+						else if (scheme.equals("intent")) {
+							externalSchemeIntent = Intent.parseUri(url, Intent.URI_INTENT_SCHEME);
 							if (mActivity != null && mActivity.get() != null) {
-								mActivity.get().startActivity(externalSchemeIntent);
+								existPackage = mActivity.get().getPackageManager().getLaunchIntentForPackage(externalSchemeIntent.getPackage());
 							}
 							else {
-								getContext().startActivity(externalSchemeIntent);
+								existPackage = getContext().getPackageManager().getLaunchIntentForPackage(externalSchemeIntent.getPackage());
 							}
 						}
-						catch (ActivityNotFoundException ignored) {}
+						else {
+							externalSchemeIntent = null;
+							existPackage = null;
+						}
 
-						// cancel the original request
-						return true;
+						if (externalSchemeIntent != null) {
+							if(existPackage != null) {
+								externalSchemeIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+
+								if (mActivity != null && mActivity.get() != null) {
+									mActivity.get().startActivity(externalSchemeIntent);
+								}
+								else {
+									getContext().startActivity(externalSchemeIntent);
+								}
+							} else {
+								Intent marketIntent = new Intent(Intent.ACTION_VIEW);
+								marketIntent.setData(Uri.parse("market://details?id=" + externalSchemeIntent.getPackage()));
+								if (mActivity != null && mActivity.get() != null) {
+									mActivity.get().startActivity(marketIntent);
+								}
+								else {
+									getContext().startActivity(marketIntent);
+								}
+							}
+
+
+							// cancel the original request
+							return true;
+						}
 					}
-				}
+				} catch (URISyntaxException e){
+
+				} catch (ActivityNotFoundException ignored) {}
 
 				// route the request through the custom URL loading method
 				view.loadUrl(url);
