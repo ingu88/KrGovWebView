@@ -6,6 +6,7 @@ package im.delight.android.webview;
  * Licensed under the MIT License (https://opensource.org/licenses/MIT)
  */
 
+import java.net.URISyntaxException;
 import android.content.ActivityNotFoundException;
 import android.view.ViewGroup;
 import android.app.DownloadManager;
