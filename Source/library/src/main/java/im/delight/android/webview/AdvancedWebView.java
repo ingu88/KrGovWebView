@@ -534,15 +534,15 @@ public class AdvancedWebView extends WebView {
 
 						if (scheme.equals("tel")) {
 							externalSchemeIntent = new Intent(Intent.ACTION_DIAL, uri);
-							existPackage = null;
+							existPackage = new Intent(Intent.ACTION_DIAL, uri);
 						}
 						else if (scheme.equals("sms")) {
 							externalSchemeIntent = new Intent(Intent.ACTION_SENDTO, uri);
-							existPackage = null;
+							existPackage = = new Intent(Intent.ACTION_SENDTO, uri);
 						}
 						else if (scheme.equals("mailto")) {
 							externalSchemeIntent = new Intent(Intent.ACTION_SENDTO, uri);
-							existPackage = null;
+							existPackage = new Intent(Intent.ACTION_SENDTO, uri);
 						}
 						else if (scheme.equals("whatsapp")) {
 							externalSchemeIntent = new Intent(Intent.ACTION_SENDTO, uri);
