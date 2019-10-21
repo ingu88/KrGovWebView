@@ -538,7 +538,7 @@ public class AdvancedWebView extends WebView {
 						}
 						else if (scheme.equals("sms")) {
 							externalSchemeIntent = new Intent(Intent.ACTION_SENDTO, uri);
-							existPackage = = new Intent(Intent.ACTION_SENDTO, uri);
+							existPackage = new Intent(Intent.ACTION_SENDTO, uri);
 						}
 						else if (scheme.equals("mailto")) {
 							externalSchemeIntent = new Intent(Intent.ACTION_SENDTO, uri);
